@@ -59,6 +59,13 @@ button{font-family:inherit}
 .acts{display:flex;gap:6px;margin-top:8px;align-items:center}
 .acts .tag{flex:1;font-size:12px;color:var(--sub)}
 .adds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.row.t-text{border-left:8px solid #2e9e6b;background:linear-gradient(rgba(46,158,107,.12),rgba(46,158,107,.12)),var(--surface)}
+.row.t-image{border-left:8px solid #8e5bd9;background:linear-gradient(rgba(142,91,217,.12),rgba(142,91,217,.12)),var(--surface)}
+.row.t-links{border-left:8px solid #2f7de1;background:linear-gradient(rgba(47,125,225,.12),rgba(47,125,225,.12)),var(--surface)}
+.row.t-post{border-left:8px solid #e8892b;background:linear-gradient(rgba(232,137,43,.14),rgba(232,137,43,.14)),var(--surface)}
+.chip{display:inline-block;color:#fff;border-radius:99px;padding:3px 12px;font-size:13px}
+.chip.c-text{background:#2e9e6b}.chip.c-image{background:#8e5bd9}.chip.c-links{background:#2f7de1}.chip.c-post{background:#e8892b}
+[data-add="text"]{border-left:6px solid #2e9e6b}[data-add="image"]{border-left:6px solid #8e5bd9}[data-add="links"]{border-left:6px solid #2f7de1}[data-add="post"]{border-left:6px solid #e8892b}
 .note{font-size:12px;color:var(--sub);margin:6px 0 0}
 .lock{padding:8px 0}
 .err{color:var(--danger);font-size:13px;min-height:20px;margin:6px 0 0}
@@ -175,7 +182,7 @@ function field(host,lab,node){host.appendChild(el("label",null,lab));host.append
 function blocks(){
   var box=$("blocks");box.textContent="";
   st.blocks.forEach(function(b,i){
-    var r=el("div","row"),h=el("div","bh");h.appendChild(el("b",null,LABEL[b.t]));
+    var r=el("div","row t-"+b.t),h=el("div","bh"),bb=el("b");bb.appendChild(el("span","chip c-"+b.t,LABEL[b.t]));h.appendChild(bb);
     var up=el("button","btn","↑"),dn=el("button","btn","↓"),dl=el("button","btn del","削除");
     up.onclick=function(){mv(st.blocks,i,-1)};dn.onclick=function(){mv(st.blocks,i,1)};
     dl.onclick=function(){if(dl.dataset.s){st.blocks.splice(i,1);save();blocks();view();return}dl.dataset.s="1";dl.textContent="本当に削除";setTimeout(function(){dl.dataset.s="";dl.textContent="削除"},3000)};
