@@ -94,7 +94,7 @@ button{font-family:inherit}
       <label>ブロック(上から順に表示されます)</label>
       <div id="blocks"></div>
       <div class="adds" style="grid-template-columns:repeat(2,1fr)">
-        <button class="btn" data-add="post">＋投稿(X・Threads)</button>
+        <button class="btn" data-add="post">＋投稿(X・Threads・Instagram)</button>
         <button class="btn" data-add="text">＋文章</button>
         <button class="btn" data-add="image">＋画像</button>
         <button class="btn" data-add="links">＋リンク</button>
@@ -128,16 +128,21 @@ function svc(u){try{var x=new URL(fix(u)),h=x.hostname.replace(/^www\./,"");if(h
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function mv(a,i,d){var j=i+d;if(j<0||j>=a.length)return;var t=a[i];a[i]=a[j];a[j]=t;save();blocks();view()}
 function esc(u){return String(u).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}
-function embedHtml(v,u){u=fix(u);if(v.n==="X"){u=u.replace("//x.com","//twitter.com");return `<blockquote class="twitter-tweet" data-dnt="true"><a href="${esc(u)}">${esc(u)}</a></blockquote>`}return `<blockquote class="text-post-media" data-text-post-permalink="${esc(u)}" data-text-post-version="0"><a href="${esc(u)}">${esc(u)}</a></blockquote>`}
+function clean(u){try{var x=new URL(fix(u));return (x.origin+x.pathname).replace(/\/$/,"")}catch(e){return fix(u)}}
+function embedHtml(v,u){u=clean(u);var e=esc(u);
+if(v.n==="X"){e=esc(u.replace("//x.com","//twitter.com"));return `<blockquote class="twitter-tweet" data-dnt="true"><a href="${e}">${e}</a></blockquote>`}
+if(v.n==="Instagram")return `<blockquote class="instagram-media" data-instgrm-permalink="${e}/" data-instgrm-version="14" style="width:100%;max-width:540px;margin:0 auto"><a href="${e}">${e}</a></blockquote>`;
+u=u.replace(/\/\/(www\.)?threads\.(net|com)/,"//www.threads.com");e=esc(u);
+return `<blockquote class="text-post-media" data-text-post-permalink="${e}" data-text-post-version="0"><a href="${e}">${e}</a></blockquote>`}
 function lib(id,src){var o=document.getElementById(id);if(o)o.remove();var e=document.createElement("script");e.id=id;e.async=true;e.src=src;document.head.appendChild(e)}
-function embeds(){if(window.twttr&&window.twttr.widgets)window.twttr.widgets.load($("vBlocks"));else if(!document.getElementById("twl"))lib("twl","https://platform.twitter.com/widgets.js");if(document.querySelector(".text-post-media"))lib("thr","https://www.threads.net/embed.js")}
+function embeds(){if(window.twttr&&window.twttr.widgets)window.twttr.widgets.load($("vBlocks"));else if(!document.getElementById("twl"))lib("twl","https://platform.twitter.com/widgets.js");if(document.querySelector(".text-post-media"))lib("thr","https://www.threads.com/embed.js");if(document.querySelector(".instagram-media")){if(window.instgrm&&window.instgrm.Embeds)window.instgrm.Embeds.process();else if(!document.getElementById("igl"))lib("igl","https://www.instagram.com/embed.js")}}
 function view(){
   $("vName").textContent=st.name||"会社名";$("vSum").textContent=st.sum||"";$("vName").style.color=st.cName||"";$("vSum").style.color=st.cSum||"";document.body.style.background=st.bg||"";
   var h=$("hero");h.style.backgroundImage=st.hero?"url("+st.hero+")":"";h.firstChild.style.display=st.hero?"none":"";var ht=$("ht");ht.textContent=st.ht||"";ht.style.color=st.hc||"";ht.style.alignItems=st.hp==="t"?"flex-start":st.hp==="m"?"center":"flex-end";ht.style.fontSize=(st.hs||24)+"px";h.classList.toggle("dk",!!st.hd);var pv=$("pv");pv.style.backgroundImage=h.style.backgroundImage;pv.classList.toggle("dk",!!st.hd);var pt=$("pt");pt.textContent=ht.textContent;pt.style.color=ht.style.color;pt.style.alignItems=ht.style.alignItems;pt.style.fontSize=((st.hs||24)*.55)+"px";
   var box=$("vBlocks");box.textContent="";var n=0,emb=0;
   st.blocks.forEach(function(b){var s=el("section","blk");
     if(b.t==="text"){if(!b.title&&!b.body)return;if(b.title)s.appendChild(tc(el("h2",null,b.title),b.ct));if(b.body)s.appendChild(tc(el("p",null,b.body),b.cb))}
-    else if(b.t==="post"){var v=svc(b.url);if(!v)return;if(b.title)s.appendChild(tc(el("h2",null,b.title),b.ct));if(!/\/(status|post)\/[\w-]+/.test(b.url||""))return;var hd=el("div");hd.innerHTML=embedHtml(v,b.url);s.appendChild(hd);emb=1}
+    else if(b.t==="post"){var v=svc(b.url);if(!v)return;if(b.title)s.appendChild(tc(el("h2",null,b.title),b.ct));if(!/\/(status|post|p|reel)\/[\w-]+/.test(b.url||""))return;var hd=el("div");hd.innerHTML=embedHtml(v,b.url);s.appendChild(hd);emb=1}
     else if(b.t==="image"){if(!b.src)return;var f=el("figure"),im=el("img");im.src=b.src;im.alt=b.cap||"";f.appendChild(im);if(b.cap)f.appendChild(el("figcaption",null,b.cap));s.appendChild(f)}
     else{var g=el("div","grid"),k=0;b.links.forEach(function(l){var v=svc(l.url);if(!v)return;k++;
       var a=el("a","card");a.href=fix(l.url);a.target="_blank";a.rel="noopener";
@@ -188,7 +193,7 @@ function blocks(){
     else if(b.t==="post"){
       var pt2=el("input");pt2.value=b.title||"";pt2.oninput=function(){b.title=pt2.value;save();view()};field(r,"見出し",pt2);
       var pu=el("input");pu.placeholder="投稿のURLを貼り付け";pu.inputMode="url";pu.value=b.url||"";var pg=el("p","note");
-      function ptg(){var s=svc(pu.value);pg.textContent=pu.value.trim()?(s?(s.n==="X"||s.n==="Threads"?"認識: "+s.n+(/\/(status|post)\//.test(pu.value)?"の投稿":"(投稿のURLではないかもしれません)"):"この欄はXとThreads用です。InstagramやLINEは「＋リンク」へ"):"URLを確認してください"):"新しい投稿に変えるときは、このURLを貼り替えるだけです"}
+      function ptg(){var s=svc(pu.value);pg.textContent=pu.value.trim()?(s?(s.n==="X"||s.n==="Threads"||s.n==="Instagram"?"認識: "+s.n+(/\/(status|post|p|reel)\//.test(pu.value)?"の投稿":"(投稿のURLではないかもしれません)"):"この欄はX・Threads・Instagram用です。LINEなどは「＋リンク」へ"):"URLを確認してください"):"新しい投稿に変えるときは、このURLを貼り替えるだけです"}
       pu.oninput=function(){b.url=pu.value;ptg();save()};pu.onchange=function(){view()};ptg();field(r,"投稿のURL",pu);r.appendChild(pg)}
     else{
       var t2=el("input");t2.value=b.title||"";t2.oninput=function(){b.title=t2.value;save();view()};field(r,"見出し",t2);colorRow(r,"見出しの色",b,"ct","#16221d");
